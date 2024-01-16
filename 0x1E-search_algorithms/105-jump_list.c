@@ -1,51 +1,64 @@
 #include "search_algos.h"
-#include <math.h>
 
 /**
- * jump_list - searches for a value in an array of
- * integers using the Jump search algorithm
+ * rec_search - searches for a value in an array of
+ * integers using the Binary search algorithm
  *
- * @list: input list
+ *
+ * @array: input array
  * @size: size of the array
  * @value: value to search in
  * Return: index of the number
  */
-listint_t *jump_list(listint_t *list, size_t size, int value)
+int rec_search(int *array, size_t size, int value)
 {
-	size_t index, k, m;
-	listint_t *prev;
+	size_t half = size / 2;
+	size_t i;
 
-	if (list == NULL || size == 0)
-		return (NULL);
+	if (array == NULL || size == 0)
+		return (-1);
 
-	m = (size_t)sqrt((double)size);
-	index = 0;
-	k = 0;
+	printf("Searching in array");
 
-	do {
-		prev = list;
-		k++;
-		index = k * m;
+	for (i = 0; i < size; i++)
+		printf("%s %d", (i == 0) ? ":" : ",", array[i]);
 
-		while (list->next && list->index < index)
-			list = list->next;
+	printf("\n");
 
-		if (list->next == NULL && index != list->index)
-			index = list->index;
+	if (half && size % 2 == 0)
+		half--;
 
-		printf("Value checked at index [%d] = [%d]\n", (int)index, list->n);
-
-	} while (index < size && list->next && list->n < value);
-
-	printf("Value found between indexes ");
-	printf("[%d] and [%d]\n", (int)prev->index, (int)list->index);
-
-	for (; prev && prev->index <= list->index; prev = prev->next)
+	if (value == array[half])
 	{
-		printf("Value checked at index [%d] = [%d]\n", (int)prev->index, prev->n);
-		if (prev->n == value)
-			return (prev);
+		if (half > 0)
+			return (rec_search(array, half + 1, value));
+		return ((int)half);
 	}
 
-	return (NULL);
+	if (value < array[half])
+		return (rec_search(array, half + 1, value));
+
+	half++;
+	return (rec_search(array + half, size - half, value) + half);
+}
+
+/**
+ * advanced_binary - calls to rec_search to return
+ * the index of the number
+ *
+ * @array: input array
+ * @size: size of the array
+ * @value: value to search in
+ * Return: index of the number
+ */
+int advanced_binary(int *array, size_t size, int value)
+{
+	int index;
+
+	index = rec_search(array, size, value);
+
+	if (index >= 0 && array[index] != value)
+		return (-1);
+
+	return (index);
 }
